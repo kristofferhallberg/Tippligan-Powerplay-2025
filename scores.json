@@ -1,14 +1,14 @@
 [
   {
     "name": "Kristoffer",
-    "points": 12,
+    "points": 0,
     "money": 0,
     "image": "https://i.imgur.com/YOURIMAGE1.jpg"
   },
   {
     "name": "Anton",
     "points": 1,
-    "money": 0,
+    "money": 500,
     "image": "https://i.imgur.com/YOURIMAGE2.jpg"
   },
   {
