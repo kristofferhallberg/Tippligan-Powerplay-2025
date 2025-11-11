@@ -1,9 +1,38 @@
-{
-  "lastUpdated": "2025-11-11",
-  "players": [
-    { "name": "Kristoffer", "points": 0, "money": 0.5, "image": "images/kristoffer.jpg" },
-    { "name": "Anton",      "points":  0, "money": 0.0, "image": "images/anton.jpg" },
-    { "name": "Johan F",    "points":  0, "money": 0.0, "image": "images/johan-f.jpg" }
-  ],
-  "currentTipper": { "name": "Eddy", "label": "Vecka 45" }
-}
+[
+  {
+    "name": "Kristoffer",
+    "points": 0,
+    "money": 0,
+    "image": "https://i.imgur.com/mq6LYHu.jpeg"
+  },
+  {
+    "name": "Anton",
+    "points": 0,
+    "money": 0,
+    "image": "https://i.imgur.com/YOURIMAGE2.jpg"
+  },
+  {
+    "name": "Eddy",
+    "points": 0,
+    "money": 0,
+    "image": "https://i.imgur.com/8bYxyO0.jpeg"
+  },
+  {
+    "name": "Niclas",
+    "points": 0,
+    "money": 0,
+    "image": "https://i.imgur.com/YOURIMAGE3.jpg"
+  },
+  {
+    "name": "Johan N",
+    "points": 0,
+    "money": 0,
+    "image": "https://i.imgur.com/PYdL2TP.jpeg"
+  },
+  {
+    "name": "Johan F",
+    "points": 0,
+    "money": 0,
+    "image": "https://i.imgur.com/hFe98jI.jpeg"
+  }
+]
