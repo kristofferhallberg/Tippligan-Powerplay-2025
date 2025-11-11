@@ -1,40 +1,184 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tipp-Ligan</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tippligan</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f7f7f7; text-align: center; }
-    h1 { margin-top: 30px; }
-    table { margin: 30px auto; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
-    th, td { padding: 10px 20px; border-bottom: 1px solid #ddd; }
-    th { background: #333; color: white; }
-    img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --primary:#111827;
+      --accent:#22c55e;
+      --table-head:#111827;
+      --table-head-text:#fff;
+      --row:#ffffff;
+      --row-alt:#fafafa;
+      --row-hover:#f1f5f9;
+      --leader:#fff8cc;
+      --shadow:0 10px 25px rgba(0,0,0,.10),0 4px 8px rgba(0,0,0,.06);
+      --radius:16px;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0b0f16; --card:#0f1622; --text:#e5e7eb; --muted:#9ca3af;
+        --primary:#e5e7eb; --table-head:#111827; --table-head-text:#e5e7eb;
+        --row:#0f1622; --row-alt:#0b101a; --row-hover:#101827; --leader:#1b1b0f;
+        --shadow:0 10px 25px rgba(0,0,0,.45),0 4px 8px rgba(0,0,0,.35);
+      }
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      line-height:1.4;
+    }
+    .wrap{
+      max-width:980px; margin:32px auto; padding:0 16px;
+    }
+    header{
+      margin:12px 0 20px;
+      display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    .logo{
+      width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
+      background: radial-gradient(120% 120% at 0% 0%, #34d399 0%, #22c55e 40%, #16a34a 100%);
+      color:white; font-weight:800; letter-spacing:.5px; box-shadow:var(--shadow);
+    }
+    h1{ font-size: clamp(28px, 3.8vw, 40px); margin:0; }
+    .sub{ color:var(--muted); font-size:14px }
+    .card{
+      background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:12px 12px 6px;
+    }
+    .controls{
+      display:flex; gap:10px; align-items:center; justify-content:space-between; padding:8px 8px 2px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      background:#e5f9ef; color:#065f46; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:600;
+    }
+    @media (prefers-color-scheme: dark){ .pill{ background:#0f2a1e; color:#a7f3d0; } }
+
+    table{
+      width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:12px;
+    }
+    thead th{
+      position:sticky; top:0; z-index:1; background:var(--table-head); color:var(--table-head-text);
+      text-align:left; font-weight:700; font-size:14px; padding:14px 14px;
+    }
+    tbody td{ padding:14px; border-bottom:1px solid rgba(0,0,0,.06) }
+    tbody tr:nth-child(odd){ background:var(--row) }
+    tbody tr:nth-child(even){ background:var(--row-alt) }
+    tbody tr:hover{ background:var(--row-hover) }
+    .rank{ width:52px; text-align:center; font-variant-numeric:tabular-nums; font-weight:700 }
+    .medal{ font-size:18px }
+    .name{ display:flex; align-items:center; gap:12px; }
+    img.avatar, .avatar{
+      width:40px; height:40px; border-radius:50%; object-fit:cover; display:inline-block;
+      border:1px solid rgba(0,0,0,.08);
+    }
+    .avatar{
+      display:inline-flex; align-items:center; justify-content:center; font-weight:700; color:var(--primary);
+      background:linear-gradient(180deg, #f3f4f6, #e5e7eb);
+    }
+    @media (prefers-color-scheme: dark){
+      .avatar{ background:linear-gradient(180deg,#1f2937,#111827); border-color:#1f2937; }
+    }
+    .money{ font-weight:700 }
+    .leader{ background:var(--leader) !important }
+    .muted{ color:var(--muted) }
+    .right{ text-align:right }
+    .footnote{ color:var(--muted); font-size:12px; padding:8px 2px 12px; text-align:center }
   </style>
 </head>
 <body>
-  <h1>Tipp-Ligan</h1>
-  <table id="scoreboard"></table>
+  <div class="wrap">
+    <header>
+      <div class="logo">TL</div>
+      <div>
+        <h1>Tipp-Ligan</h1>
+        <div class="sub">Poäng & inspelade pengar – uppdateras via <code>scores.json</code></div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="controls">
+        <div class="pill" id="summary">Laddar sammanfattning…</div>
+        <div class="muted">🥇 leder på flest poäng · 💰 gul rad = mest pengar</div>
+      </div>
+
+      <table id="board">
+        <thead>
+          <tr>
+            <th class="rank">#</th>
+            <th>Spelare</th>
+            <th class="right">Poäng</th>
+            <th class="right">Inspelade pengar</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="4" class="muted" style="padding:22px">Laddar tabell…</td></tr>
+        </tbody>
+      </table>
+
+      <div class="footnote">Redigera <code>scores.json</code> för att uppdatera – inga deploys behövs.</div>
+    </div>
+  </div>
 
   <script>
-    fetch('scores.json')
-      .then(r => r.json())
-      .then(data => {
-        let html = '<tr><th>Bild</th><th>Namn</th><th>Poäng</th><th>Inspelade pengar</th></tr>';
-        data.sort((a, b) => b.points - a.points);
-        const maxMoney = Math.max(...data.map(p => p.money));
-        data.forEach(p => {
-          html += `
-            <tr style="background:${p.money === maxMoney ? '#fff8cc' : 'white'}">
-              <td><img src="${p.image}" alt="${p.name}"></td>
-              <td>${p.name}</td>
-              <td>${p.points}</td>
-              <td>${p.money.toFixed(2)} kr</td>
-            </tr>`;
+    // ---- Hjälpfunktioner
+    const kr = v => (Number.isFinite(v) ? v : 0).toFixed(2) + ' kr';
+    const initials = name => (name||'?').trim().split(/\s+/).map(w=>w[0]?.toUpperCase()||'').slice(0,2).join('');
+    const imgOrInitials = p => {
+      const safe = (p.image||'').trim();
+      if (!safe) return `<span class="avatar" aria-hidden="true">${initials(p.name)}</span>`;
+      return `<img class="avatar" src="${safe}" alt="${p.name}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'avatar',textContent:'${initials(p.name)}'}))">`;
+    };
+
+    async function load(){
+      const body = document.getElementById('rows');
+      try{
+        const res = await fetch('scores.json', {cache:'no-store'});
+        if(!res.ok) throw new Error('scores.json saknas eller är privat');
+        const data = await res.json();
+
+        // Defaults
+        const players = (Array.isArray(data)?data:[]).map(p=>({
+          name: p.name || 'Okänt namn',
+          points: Number.isFinite(p.points)?p.points:0,
+          money: Number.isFinite(p.money)?p.money:0,
+          image: p.image || ''
+        }));
+
+        // Sortera på poäng (desc). Rang = index+1. Medalj för top 3.
+        players.sort((a,b)=>b.points-a.points);
+        const maxMoney = Math.max(0, ...players.map(p=>p.money));
+        const medals = ['🥇','🥈','🥉'];
+
+        body.innerHTML = '';
+        players.forEach((p,i)=>{
+          const medal = medals[i] || '';
+          const isMoneyLeader = p.money === maxMoney && maxMoney > 0;
+          body.insertAdjacentHTML('beforeend', `
+            <tr class="${isMoneyLeader ? 'leader' : ''}">
+              <td class="rank"><span class="medal">${medal || i+1}</span></td>
+              <td class="name">${imgOrInitials(p)} <span>${p.name}</span></td>
+              <td class="right">${p.points}</td>
+              <td class="right money">${kr(p.money)}</td>
+            </tr>
+          `);
         });
-        document.getElementById('scoreboard').innerHTML = html;
-      });
-  </script>
-</body>
-</html>
+
+        // Sammanfattning
+        const leader = players[0]?.name || '—';
+        const pot = players.reduce((s,p)=>s+(Number.isFinite(p.money)?p.money:0),0);
+        document.getElementById('summary').textContent = `🥇 ${leader} leder • 💰 Total pott ${kr(pot)}`;
+      }catch(err){
+        body.innerHTML = `<tr><td colspan="4" style="padding:22px">
+          Kunde inte ladda <code>scores.json</code>. Kontrollera att filen ligger bredvid <code>index.html</code>
+          och att repositoryt är Public. (Fel: ${err.message})
+        </td></tr>`;
+        document.getElementById('summary').textContent = 'Fel vid laddning av
