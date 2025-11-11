@@ -128,57 +128,78 @@
     </div>
   </div>
 
-  <script>
-    // ---- Hjälpfunktioner
-    const kr = v => (Number.isFinite(v) ? v : 0).toFixed(2) + ' kr';
-    const initials = name => (name||'?').trim().split(/\s+/).map(w=>w[0]?.toUpperCase()||'').slice(0,2).join('');
-    const imgOrInitials = p => {
-      const safe = (p.image||'').trim();
-      if (!safe) return `<span class="avatar" aria-hidden="true">${initials(p.name)}</span>`;
-      return `<img class="avatar" src="${safe}" alt="${p.name}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'avatar',textContent:'${initials(p.name)}'}))">`;
-    };
+<script>
+  function kr(v){ v = Number(v); return (isFinite(v)?v:0).toFixed(2) + ' kr'; }
+  function initials(name){
+    name = (name||'?').replace(/\s+/g,' ').trim();
+    var parts = name.split(' ');
+    var out = '';
+    for (var i=0;i<parts.length && i<2;i++){
+      out += (parts[i].charAt(0) || '').toUpperCase();
+    }
+    return out || '?';
+  }
+  function avatar(p){
+    var img = (p.image||'').trim();
+    if(!img){
+      return '<span class="avatar">'+initials(p.name)+'</span>';
+    }
+    return '<img class="avatar" src="'+img+'" alt="'+(p.name||'Spelare')+'" onerror="this.outerHTML=\'<span class=&quot;avatar&quot;>'+initials(p.name)+'</span>\'">';
+  }
 
-    async function load(){
-      const body = document.getElementById('rows');
-      try{
-        const res = await fetch('scores.json', {cache:'no-store'});
-        if(!res.ok) throw new Error('scores.json saknas eller är privat');
-        const data = await res.json();
+  (function load(){
+    var body = document.getElementById('rows');
+    var summary = document.getElementById('summary');
+    body.innerHTML = '<tr><td colspan="4" class="muted" style="padding:22px">Laddar tabell…</td></tr>';
 
-        // Defaults
-        const players = (Array.isArray(data)?data:[]).map(p=>({
-          name: p.name || 'Okänt namn',
-          points: Number.isFinite(p.points)?p.points:0,
-          money: Number.isFinite(p.money)?p.money:0,
-          image: p.image || ''
-        }));
+    fetch('scores.json', { cache: 'no-store' })
+      .then(function(r){
+        if(!r.ok) throw new Error('HTTP '+r.status+' – kunde inte läsa scores.json');
+        return r.json();
+      })
+      .then(function(data){
+        if(!Array.isArray(data) || data.length===0){
+          body.innerHTML = '<tr><td colspan="4" class="muted" style="padding:22px">Inga deltagare i <code>scores.json</code> ännu.</td></tr>';
+          summary.textContent = 'Ingen data än';
+          return;
+        }
 
-        // Sortera på poäng (desc). Rang = index+1. Medalj för top 3.
-        players.sort((a,b)=>b.points-a.points);
-        const maxMoney = Math.max(0, ...players.map(p=>p.money));
-        const medals = ['🥇','🥈','🥉'];
+        // Normalisera och sortera
+        var players = data.map(function(p){
+          return {
+            name: p && p.name ? p.name : 'Okänt namn',
+            points: (p && isFinite(p.points)) ? Number(p.points) : 0,
+            money: (p && isFinite(p.money))  ? Number(p.money)  : 0,
+            image: p && p.image ? String(p.image) : ''
+          };
+        }).sort(function(a,b){ return b.points - a.points; });
 
-        body.innerHTML = '';
-        players.forEach((p,i)=>{
-          const medal = medals[i] || '';
-          const isMoneyLeader = p.money === maxMoney && maxMoney > 0;
-          body.insertAdjacentHTML('beforeend', `
-            <tr class="${isMoneyLeader ? 'leader' : ''}">
-              <td class="rank"><span class="medal">${medal || i+1}</span></td>
-              <td class="name">${imgOrInitials(p)} <span>${p.name}</span></td>
-              <td class="right">${p.points}</td>
-              <td class="right money">${kr(p.money)}</td>
-            </tr>
-          `);
-        });
+        var maxMoney = Math.max.apply(null, players.map(function(p){ return p.money; }).concat([0]));
+        var medals = ['🥇','🥈','🥉'];
 
-        // Sammanfattning
-        const leader = players[0]?.name || '—';
-        const pot = players.reduce((s,p)=>s+(Number.isFinite(p.money)?p.money:0),0);
-        document.getElementById('summary').textContent = `🥇 ${leader} leder • 💰 Total pott ${kr(pot)}`;
-      }catch(err){
-        body.innerHTML = `<tr><td colspan="4" style="padding:22px">
-          Kunde inte ladda <code>scores.json</code>. Kontrollera att filen ligger bredvid <code>index.html</code>
-          och att repositoryt är Public. (Fel: ${err.message})
-        </td></tr>`;
-        document.getElementById('summary').textContent = 'Fel vid laddning av
+        var rows = '';
+        for(var i=0;i<players.length;i++){
+          var p = players[i];
+          var medal = medals[i] || (i+1);
+          var leaderClass = (p.money===maxMoney && maxMoney>0) ? ' class="leader"' : '';
+          rows += '<tr'+leaderClass+'>'
+                +   '<td class="rank"><span class="medal">'+medal+'</span></td>'
+                +   '<td class="name">'+avatar(p)+' <span>'+p.name+'</span></td>'
+                +   '<td class="right">'+p.points+'</td>'
+                +   '<td class="right money">'+kr(p.money)+'</td>'
+                + '</tr>';
+        }
+        body.innerHTML = rows;
+
+        var totalPot = players.reduce(function(s,p){ return s+p.money; }, 0);
+        summary.textContent = '🥇 '+players[0].name+' leder • 💰 Total pott '+kr(totalPot);
+      })
+      .catch(function(err){
+        body.innerHTML = '<tr><td colspan="4" style="padding:22px">Kunde inte ladda '
+                       + '<code>scores.json</code>. Kontrollera att filen ligger bredvid '
+                       + '<code>index.html</code> och att repo/Pages är public. '
+                       + '(Fel: '+err.message+')</td></tr>';
+        if(summary) summary.textContent = 'Fel vid laddning av data';
+      });
+  })();
+</script>
