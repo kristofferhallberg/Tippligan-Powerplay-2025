@@ -1,44 +1,47 @@
-[
-  {
-    "name": "Kristoffer",
-    "points": 0,
-    "EightHits": 0,
-    "money": 0,
-    "image": "https://i.imgur.com/mq6LYHu.jpeg"
-  },
-  {
-    "name": "Anton",
-    "points": 0,
-    "EightHits": 0,
-    "money": 0,
-    "image": "https://i.imgur.com/WcGqaAU.jpeg"
-  },
-  {
-    "name": "Eddy",
-    "points": 7,
-    "EightHits": 0,
-    "money": 0,
-    "image": "https://i.imgur.com/8bYxyO0.jpeg"
-  },
-  {
-    "name": "Niclas",
-    "points": 0,
-    "EightHits": 0,
-    "money": 0,
-    "image": "https://i.imgur.com/uxgfgsa.jpeg"
-  },
-  {
-    "name": "Johan N",
-    "points": 0,
-    "EightHits": 0,
-    "money": 0,
-    "image": "https://i.imgur.com/PYdL2TP.jpeg"
-  },
-  {
-    "name": "Johan F",
-    "points": 0,
-    "EightHits": 0,
-    "money": 0,
-    "image": "https://i.imgur.com/hFe98jI.jpeg"
-  }
-]
+{
+  "totalProfit": -192,
+  "players": [
+    {
+      "name": "Kristoffer",
+      "points": 0,
+      "eightHits": 0,
+      "money": 0,
+      "image": "https://i.imgur.com/mq6LYHu.jpeg"
+    },
+    {
+      "name": "Anton",
+      "points": 0,
+      "eightHits": 0,
+      "money": 0,
+      "image": "https://i.imgur.com/WcGqaAU.jpeg"
+    },
+    {
+      "name": "Eddy",
+      "points": 7,
+      "eightHits": 0,
+      "money": 0,
+      "image": "https://i.imgur.com/8bYxyO0.jpeg"
+    },
+    {
+      "name": "Niclas",
+      "points": 0,
+      "eightHits": 0,
+      "money": 0,
+      "image": "https://i.imgur.com/uxgfgsa.jpeg"
+    },
+    {
+      "name": "Johan N",
+      "points": 0,
+      "eightHits": 0,
+      "money": 0,
+      "image": "https://i.imgur.com/PYdL2TP.jpeg"
+    },
+    {
+      "name": "Johan F",
+      "points": 0,
+      "eightHits": 0,
+      "money": 0,
+      "image": "https://i.imgur.com/hFe98jI.jpeg"
+    }
+  ]
+}
