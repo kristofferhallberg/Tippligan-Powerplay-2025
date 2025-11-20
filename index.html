@@ -154,25 +154,24 @@
     body.innerHTML = '<tr><td colspan="5" class="muted" style="padding:22px">Laddar tabell…</td></tr>';
 
     fetch('scores.json', { cache: 'no-store' })
-      .then(function(r){
-        if(!r.ok) throw new Error('HTTP '+r.status+' – kunde inte läsa scores.json');
+      .then(r => {
+        if(!r.ok) throw new Error('HTTP '+r.status);
         return r.json();
       })
       .then(function(data){
-        if(!Array.isArray(data) || data.length===0){
-          body.innerHTML = '<tr><td colspan="5" class="muted" style="padding:22px">Inga deltagare i <code>scores.json</code> ännu.</td></tr>';
-          summary.textContent = 'Ingen data än';
+        if(!data || !Array.isArray(data.players)){
+          body.innerHTML = '<tr><td colspan="5" class="muted" style="padding:22px">Fel format i scores.json</td></tr>';
+          summary.textContent = 'Ingen data';
           return;
         }
 
-        // Normalisera och sortera
-        var players = data.map(function(p){
+        var players = data.players.map(function(p){
           return {
-            name: p && p.name ? p.name : 'Okänt namn',
-            points: (p && isFinite(p.points)) ? Number(p.points) : 0,
-            eightHits: (p && isFinite(p.eightHits)) ? Number(p.eightHits) : 0, // NYTT FÄLT
-            money: (p && isFinite(p.money))  ? Number(p.money)  : 0,
-            image: p && p.image ? String(p.image) : ''
+            name: p.name || 'Okänt namn',
+            points: Number(p.points) || 0,
+            eightHits: Number(p.eightHits) || 0,
+            money: Number(p.money) || 0,
+            image: p.image || ''
           };
         }).sort(function(a,b){ return b.points - a.points; });
 
@@ -188,21 +187,23 @@
                 +   '<td class="rank"><span class="medal">'+medal+'</span></td>'
                 +   '<td class="name">'+avatar(p)+' <span>'+p.name+'</span></td>'
                 +   '<td class="right">'+p.points+'</td>'
-                +   '<td class="right">'+p.eightHits+'</td>'  <!-- NY CELL -->
+                +   '<td class="right">'+p.eightHits+'</td>'
                 +   '<td class="right money">'+kr(p.money)+'</td>'
                 + '</tr>';
         }
         body.innerHTML = rows;
 
         var totalPot = players.reduce(function(s,p){ return s+p.money; }, 0);
-        summary.textContent = '🥇 '+players[0].name+' leder • 💰 Total pott '+kr(totalPot);
+        var profit = Number(data.totalProfit) || 0;
+
+        summary.textContent =
+            '🥇 ' + players[0].name +
+            ' leder • 💰 Total pott ' + kr(totalPot) +
+            ' • 📈 Total profit ' + kr(profit);
       })
       .catch(function(err){
-        body.innerHTML = '<tr><td colspan="5" style="padding:22px">Kunde inte ladda '
-                       + '<code>scores.json</code>. Kontrollera att filen ligger bredvid '
-                       + '<code>index.html</code> och att repo/Pages är public. '
-                       + '(Fel: '+err.message+')</td></tr>';
-        if(summary) summary.textContent = 'Fel vid laddning av data';
+        body.innerHTML = '<tr><td colspan="5" style="padding:22px">Kunde inte läsa data ('+err.message+')</td></tr>';
+        summary.textContent = 'Fel vid laddning';
       });
   })();
 </script>
