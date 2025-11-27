@@ -1,9 +1,9 @@
 {
-  "totalProfit": 128,
+  "totalProfit": 32,
   "players": [
     {
       "name": "Kristoffer",
-      "points": 0,
+      "points": 6,
       "eightHits": 0,
       "money": 0,
       "image": "https://i.imgur.com/mq6LYHu.jpeg"
