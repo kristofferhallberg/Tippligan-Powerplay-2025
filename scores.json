@@ -1,5 +1,5 @@
 {
-  "totalProfit": -252,
+  "totalProfit": -348,
   "players": [
     {
       "name": "Kristoffer",
@@ -17,7 +17,7 @@
     },
     {
       "name": "Eddy",
-      "points": 7,
+      "points": 10,
       "eightHits": 0,
       "money": 0,
       "image": "https://i.imgur.com/8bYxyO0.jpeg"
